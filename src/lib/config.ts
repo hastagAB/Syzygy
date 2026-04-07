@@ -36,3 +36,6 @@ export const TLE_CACHE_TTL_MS = Number(process.env.TLE_CACHE_TTL_MS ?? 7_200_000
 export const EARTH_RADIUS_KM = 6371;
 
 export const MIN_TARGET_ALTITUDE_DEG = 5;
+
+/** Default satellite size for angular diameter calculation (ISS ~109m) */
+export const DEFAULT_SATELLITE_SIZE_METERS = 109;
