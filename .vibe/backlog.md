@@ -4,18 +4,18 @@ Ordered by dependency. Execute top-to-bottom within each phase.
 
 ---
 
-## Phase 1: Foundation (Core Engine)
+## Phase 1: Foundation (Core Engine) - COMPLETE
 
 - [x] **S001** - Project scaffolding `[P0]`
-- [ ] **S002** - Type definitions `[P0] [needs: S001]`
-- [ ] **S003** - TLE fetcher + parser `[P0] [needs: S002]`
-- [ ] **S004** - SGP4 propagation wrapper `[P0] [needs: S002]`
-- [ ] **S005** - Sun/Moon ephemeris `[P0] [needs: S002]`
-- [ ] **S006** - Geometry module (coordinates + angular separation) `[P0] [needs: S002]`
-- [ ] **S007** - Transit detector (coarse scan) `[P0] [needs: S003, S004, S005, S006]`
-- [ ] **S008** - Transit detector (fine scan) `[P0] [needs: S007]`
-- [ ] **S009** - Ground track calculator `[P1] [needs: S008]`
-- [ ] **S010** - Phase 1 e2e: validate against known ISS transit `[P0] [needs: S007, S008]`
+- [x] **S002** - Type definitions `[P0] [needs: S001]`
+- [x] **S003** - TLE fetcher + parser `[P0] [needs: S002]`
+- [x] **S004** - SGP4 propagation wrapper `[P0] [needs: S002]`
+- [x] **S005** - Sun/Moon ephemeris `[P0] [needs: S002]`
+- [x] **S006** - Geometry module (coordinates + angular separation) `[P0] [needs: S002]`
+- [x] **S007** - Transit detector (coarse scan) `[P0] [needs: S003, S004, S005, S006]`
+- [x] **S008** - Transit detector (fine scan) `[P0] [needs: S007]`
+- [x] **S009** - Ground track calculator `[P1] [needs: S008]`
+- [x] **S010** - Phase 1 e2e: validate against known ISS transit `[P0] [needs: S007, S008]`
 
 ## Phase 2: API Layer
 
