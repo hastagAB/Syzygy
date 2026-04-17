@@ -1,11 +1,24 @@
+"use client";
+
+import TransitMap from "@/components/map";
+import SearchPanel from "@/components/search/SearchPanel";
+import ResultsList from "@/components/results/ResultsList";
+
 export default function Home() {
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center p-8">
-      <h1 className="text-4xl font-bold tracking-tight">Syzygy</h1>
-      <p className="mt-4 text-lg text-gray-400">Satellite Transit Finder</p>
-      <p className="mt-2 text-sm text-gray-500">
-        Predict when ISS, Hubble, and Tiangong transit the Sun or Moon from your location.
-      </p>
-    </main>
+    <div className="flex h-screen flex-col md:flex-row">
+      {/* Sidebar */}
+      <aside className="flex w-full flex-col overflow-y-auto border-r border-gray-800 bg-gray-900 md:w-96">
+        <SearchPanel />
+        <div className="border-t border-gray-800">
+          <ResultsList />
+        </div>
+      </aside>
+
+      {/* Map */}
+      <main className="flex-1">
+        <TransitMap />
+      </main>
+    </div>
   );
 }
