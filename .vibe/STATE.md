@@ -1,15 +1,14 @@
 # State
 
 ## Now
-Phase 2 (API Layer). Next: S011 search endpoint.
-Phase 1 complete: 67 tests, 10 slices (S001-S010), core engine validated e2e.
+Phase 3-4 (Frontend + API wiring). Core engine + API + UI components all built.
+Next: S027 (ground track map rendering), S030+ (Polish phase).
 
 ## Last working state
-Commit ac096bb - Phase 1 e2e gate green. All engine modules operational:
-- TLE fetcher (S003), SGP4 wrapper (S004), Ephemeris (S005), Geometry (S006)
-- Transit detector: coarse scan (S007) + fine scan (S008)
-- Ground track calculator (S009)
-- Pipeline: coarseScan -> fineScan -> computeGroundTrack
+Commit 98499be - Full app builds and runs. 87 tests green, 15 test files.
+- Phase 1 COMPLETE: Engine (S001-S010) - TLE, SGP4, ephemeris, geometry, transit detector, ground track
+- Phase 2 COMPLETE: API (S011-S014) - TLE cache, satellite catalog, search endpoint, geocode proxy
+- Phase 3-4 IN PROGRESS: UI (S017-S025) - Search panel, results list, Leaflet map, Zustand store
 
 ## Active constraints
 - All computation server-side (Next.js API routes)
