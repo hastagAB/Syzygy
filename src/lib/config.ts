@@ -16,7 +16,7 @@ export const DEFAULT_FINE_INTERVAL_SEC = Number(
 );
 
 export const DEFAULT_CANDIDATE_THRESHOLD_DEG = Number(
-  process.env.DEFAULT_CANDIDATE_THRESHOLD_DEG ?? 2,
+  process.env.DEFAULT_CANDIDATE_THRESHOLD_DEG ?? 5,
 );
 
 export const DEFAULT_RADIUS_KM = Number(process.env.DEFAULT_RADIUS_KM ?? 100);

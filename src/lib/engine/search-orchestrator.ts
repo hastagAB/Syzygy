@@ -1,5 +1,12 @@
 import { coarseScan, fineScan } from "@/lib/engine/transit-detector";
 import { computeGroundTrack } from "@/lib/engine/ground-track";
+import {
+  generateSamplePoints,
+  haversineDistanceKm,
+  angularSeparationDeg,
+} from "@/lib/engine/geometry";
+import { propagateSatellite, getTopocentricPosition } from "@/lib/engine/sgp4";
+import { getSunPosition, getMoonPosition } from "@/lib/engine/ephemeris";
 import { DEFAULT_CANDIDATE_THRESHOLD_DEG } from "@/lib/config";
 import type { LatLon } from "@/types";
 import type {
@@ -40,52 +47,111 @@ export interface SearchOutput {
 
 /**
  * Orchestrate the full transit search pipeline:
- * coarse scan -> fine scan -> ground track for each satellite/target combo.
+ * 1. Generate sample observation points across the travel radius
+ * 2. Multi-observer coarse scan to find candidate windows
+ * 3. For each candidate: locate best observation point via local ground track
+ * 4. Fine scan from best point to confirm transit
+ * 5. Full ground track for confirmed transits
  */
 export function searchTransits(input: SearchInput): SearchOutput {
   const startTime = Date.now();
   const transits: TransitEvent[] = [];
 
-  for (const satellite of input.satellites) {
+  const samplePoints = generateSamplePoints(input.observer, input.radiusKm);
+
+  // Expand the coarse threshold to account for parallax across the travel radius.
+  // ISS at ~400km: arctan(radiusKm / 400) gives max parallax offset.
+  // Use a conservative 350km to handle lower-altitude portions of orbits.
+  const parallaxDeg = (Math.atan(input.radiusKm / 350) * 180) / Math.PI;
+  const effectiveThreshold = DEFAULT_CANDIDATE_THRESHOLD_DEG + parallaxDeg;
+
+  for (const sat of input.satellites) {
     for (const target of input.targets) {
       const candidates = coarseScan({
         observer: input.observer,
-        tleLine1: satellite.line1,
-        tleLine2: satellite.line2,
-        satelliteNoradId: satellite.noradId,
+        observers: samplePoints,
+        tleLine1: sat.line1,
+        tleLine2: sat.line2,
+        satelliteNoradId: sat.noradId,
         target,
         start: input.dateRange.start,
         end: input.dateRange.end,
-        thresholdDeg: DEFAULT_CANDIDATE_THRESHOLD_DEG,
+        thresholdDeg: effectiveThreshold,
       });
 
       for (const candidate of candidates) {
-        const fineResult = fineScan({
-          observer: input.observer,
-          tleLine1: satellite.line1,
-          tleLine2: satellite.line2,
-          satelliteNoradId: satellite.noradId,
+        const midpointMs =
+          (candidate.start.getTime() + candidate.end.getTime()) / 2;
+        const midpointTime = new Date(midpointMs);
+
+        const bestSample = findBestSamplePoint(
+          samplePoints,
+          sat.line1,
+          sat.line2,
+          midpointTime,
+          target,
+        );
+        if (!bestSample) continue;
+
+        // Preliminary fine scan to find accurate closest approach time
+        const prelimResult = fineScan({
+          observer: bestSample,
+          tleLine1: sat.line1,
+          tleLine2: sat.line2,
+          satelliteNoradId: sat.noradId,
           candidate,
-          satelliteSizeMeters: satellite.sizeMeters,
+          satelliteSizeMeters: sat.sizeMeters,
+        });
+        if (!prelimResult) continue;
+
+        // Local ground track around best sample at closest approach time
+        const localRadius = Math.min(30, input.radiusKm);
+        const localGT = computeGroundTrack({
+          center: bestSample,
+          radiusKm: localRadius,
+          gridSpacingKm: 2,
+          transitTime: prelimResult.closestApproach.time,
+          tleLine1: sat.line1,
+          tleLine2: sat.line2,
+          target,
+          satelliteSizeMeters: sat.sizeMeters,
         });
 
+        const hasVisibleTransit = localGT.gridPoints.some(
+          (p) => p.isTransitVisible,
+        );
+        if (!hasVisibleTransit) continue;
+
+        const bestDist = haversineDistanceKm(input.observer, localGT.bestPoint);
+        if (bestDist > input.radiusKm) continue;
+
+        // Precise fine scan from the best ground track point
+        const fineResult = fineScan({
+          observer: { lat: localGT.bestPoint.lat, lon: localGT.bestPoint.lon },
+          tleLine1: sat.line1,
+          tleLine2: sat.line2,
+          satelliteNoradId: sat.noradId,
+          candidate,
+          satelliteSizeMeters: sat.sizeMeters,
+        });
         if (!fineResult?.transit) continue;
 
+        // Full ground track for display
         const groundTrack = computeGroundTrack({
           center: input.observer,
           radiusKm: input.radiusKm,
           transitTime: fineResult.closestApproach.time,
-          tleLine1: satellite.line1,
-          tleLine2: satellite.line2,
+          tleLine1: sat.line1,
+          tleLine2: sat.line2,
           target,
-          satelliteSizeMeters: satellite.sizeMeters,
+          satelliteSizeMeters: sat.sizeMeters,
         });
 
         const event: TransitEvent = {
-          id: `${satellite.noradId}-${target}-${fineResult.closestApproach.time.getTime()}`,
+          id: `${sat.noradId}-${target}-${fineResult.closestApproach.time.getTime()}`,
           satellite: {
-            name: satellite.name,
-            noradId: satellite.noradId,
+            name: sat.name,
+            noradId: sat.noradId,
             angularDiameterArcsec:
               fineResult.closestApproach.satelliteAngularDiameterArcsec,
           },
@@ -99,7 +165,10 @@ export function searchTransits(input: SearchInput): SearchOutput {
           observationPoint: {
             lat: groundTrack.bestPoint.lat,
             lon: groundTrack.bestPoint.lon,
-            distanceFromUserKm: 0,
+            distanceFromUserKm: haversineDistanceKm(
+              input.observer,
+              groundTrack.bestPoint,
+            ),
           },
           targetBody: {
             altitudeDeg: fineResult.closestApproach.targetPosition.altitudeDeg,
@@ -111,7 +180,10 @@ export function searchTransits(input: SearchInput): SearchOutput {
             centerline: groundTrack.centerline,
             corridorWidthKm: groundTrack.corridorWidthKm,
           },
-          quality: computeQuality(fineResult.closestApproach.separationArcsec, target),
+          quality: computeQuality(
+            fineResult.closestApproach.separationArcsec,
+            target,
+          ),
           minSeparationArcsec: fineResult.closestApproach.separationArcsec,
         };
 
@@ -139,6 +211,39 @@ export function searchTransits(input: SearchInput): SearchOutput {
     transits,
     suggestions,
   };
+}
+
+/**
+ * Find the sample point with the smallest satellite-target angular separation.
+ */
+function findBestSamplePoint(
+  samplePoints: readonly LatLon[],
+  tleLine1: string,
+  tleLine2: string,
+  time: Date,
+  target: TransitTarget,
+): LatLon | null {
+  const satResult = propagateSatellite(tleLine1, tleLine2, time);
+  if (!satResult) return null;
+
+  const getTargetPos = target === "sun" ? getSunPosition : getMoonPosition;
+  const targetPos = getTargetPos(time, samplePoints[0]);
+
+  let bestPoint: LatLon = samplePoints[0];
+  let bestSep = Infinity;
+
+  for (const point of samplePoints) {
+    const satTopo = getTopocentricPosition(satResult.eci, time, point);
+    if (satTopo.elevationDeg < 0) continue;
+
+    const sep = angularSeparationDeg(satTopo, targetPos);
+    if (sep < bestSep) {
+      bestSep = sep;
+      bestPoint = point;
+    }
+  }
+
+  return bestPoint;
 }
 
 function computeQuality(

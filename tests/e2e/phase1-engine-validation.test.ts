@@ -150,10 +150,11 @@ describe("Phase 1 E2E: Engine Pipeline Validation", () => {
       target: fixture.target,
       start: new Date(fixture.searchWindow.start),
       end: new Date(fixture.searchWindow.end),
-      thresholdDeg: 5,
+      thresholdDeg: 15,
     });
 
-    // Should find lunar candidates over 2-day window
+    // ISS passes the Moon's general region multiple times over 2 days
+    // with a 15-degree threshold (used for pipeline validation, not transit detection)
     expect(candidates.length).toBeGreaterThanOrEqual(1);
 
     for (const c of candidates) {

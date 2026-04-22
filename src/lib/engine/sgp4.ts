@@ -2,6 +2,17 @@ import * as satellite from "satellite.js";
 import { degToRad, radToDeg } from "@/lib/engine/geometry";
 import type { ECIPosition, LatLonAlt, TopocentricPosition, LatLon } from "@/types";
 
+const satrecCache = new Map<string, satellite.SatRec>();
+
+function getSatrec(tleLine1: string, tleLine2: string): satellite.SatRec {
+  let satrec = satrecCache.get(tleLine1);
+  if (!satrec) {
+    satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    satrecCache.set(tleLine1, satrec);
+  }
+  return satrec;
+}
+
 export interface PropagationResult {
   readonly eci: ECIPosition;
   readonly velocity: { readonly x: number; readonly y: number; readonly z: number };
@@ -18,7 +29,7 @@ export function propagateSatellite(
   date: Date,
 ): PropagationResult | null {
   try {
-    const satrec = satellite.twoline2satrec(tleLine1, tleLine2);
+    const satrec = getSatrec(tleLine1, tleLine2);
     const result = satellite.propagate(satrec, date);
 
     if (

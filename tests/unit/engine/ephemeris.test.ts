@@ -17,11 +17,11 @@ describe("sun ephemeris", () => {
 
     // At local solar noon in Milan on June solstice, Sun altitude ~68 degrees
     // (90 - 45.46 + 23.44 = 67.98)
-    expect(pos.elevationDeg).toBeGreaterThan(60);
-    expect(pos.elevationDeg).toBeLessThan(75);
-    // Sun should be roughly south-southeast to south (130-200 degrees azimuth)
-    expect(pos.azimuthDeg).toBeGreaterThan(120);
-    expect(pos.azimuthDeg).toBeLessThan(200);
+    expect(pos.elevationDeg).toBeGreaterThan(65);
+    expect(pos.elevationDeg).toBeLessThan(71);
+    // Sun should be roughly south at solar noon (170-190 degrees azimuth)
+    expect(pos.azimuthDeg).toBeGreaterThan(170);
+    expect(pos.azimuthDeg).toBeLessThan(195);
   });
 
   it("should_return_negative_altitude_when_below_horizon", () => {

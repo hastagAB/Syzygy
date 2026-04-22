@@ -15,6 +15,15 @@ function jdToT(jd: number): number {
 }
 
 /**
+ * Convert sidereal time from the astronomia library to radians.
+ * astronomia's sidereal.apparent(jd) returns seconds of sidereal time,
+ * NOT radians. Convert: radians = seconds * (2PI / 86400).
+ */
+function siderealSecondsToRadians(seconds: number): number {
+  return ((seconds * Math.PI) / 43200) % (2 * Math.PI);
+}
+
+/**
  * Compute the Sun's topocentric position (azimuth, elevation) as seen from
  * a specific location on Earth.
  */
@@ -31,8 +40,8 @@ export function getSunPosition(date: Date, observer: LatLon): TopocentricPositio
   const obsLon = degToRad(observer.lon);
 
   // Compute local sidereal time
-  const theta0 = sidereal.apparent(jd) % (2 * Math.PI); // Greenwich apparent sidereal time in radians
-  const localSiderealTime = theta0 + obsLon; // Local sidereal time
+  const theta0 = siderealSecondsToRadians(sidereal.apparent(jd));
+  const localSiderealTime = theta0 + obsLon;
 
   // Hour angle
   const H = localSiderealTime - ra;
@@ -68,7 +77,7 @@ export function getMoonPosition(date: Date, observer: LatLon): TopocentricPositi
   const obsLon = degToRad(observer.lon);
 
   // Compute local sidereal time
-  const theta0 = sidereal.apparent(jd) % (2 * Math.PI);
+  const theta0 = siderealSecondsToRadians(sidereal.apparent(jd));
   const localSiderealTime = theta0 + obsLon;
   const H = localSiderealTime - moonRA;
 

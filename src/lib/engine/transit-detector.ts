@@ -21,6 +21,7 @@ import type { TransitTarget, CandidateWindow } from "@/types/transit";
 
 export interface CoarseScanOptions {
   readonly observer: LatLon;
+  readonly observers?: readonly LatLon[];
   readonly tleLine1: string;
   readonly tleLine2: string;
   readonly satelliteNoradId: number;
@@ -31,14 +32,68 @@ export interface CoarseScanOptions {
   readonly thresholdDeg?: number;
 }
 
+interface SatellitePass {
+  readonly riseTime: number;
+  readonly setTime: number;
+}
+
+/**
+ * Phase 1: Find all satellite passes above the horizon.
+ * Scans at 60-second intervals to detect rise/set windows.
+ */
+function findSatellitePasses(
+  tleLine1: string,
+  tleLine2: string,
+  observer: LatLon,
+  start: Date,
+  end: Date,
+): SatellitePass[] {
+  const passes: SatellitePass[] = [];
+  const stepMs = 60_000; // 60s intervals
+  let passStart: number | null = null;
+
+  for (let t = start.getTime(); t <= end.getTime(); t += stepMs) {
+    const date = new Date(t);
+    const satResult = propagateSatellite(tleLine1, tleLine2, date);
+
+    if (!satResult) {
+      if (passStart !== null) {
+        passes.push({ riseTime: passStart, setTime: t - stepMs });
+        passStart = null;
+      }
+      continue;
+    }
+
+    const topo = getTopocentricPosition(satResult.eci, date, observer);
+
+    if (topo.elevationDeg > -5) {
+      if (passStart === null) passStart = t;
+    } else {
+      if (passStart !== null) {
+        passes.push({ riseTime: passStart, setTime: t - stepMs });
+        passStart = null;
+      }
+    }
+  }
+
+  if (passStart !== null) {
+    passes.push({ riseTime: passStart, setTime: end.getTime() });
+  }
+
+  return passes;
+}
+
 /**
  * Coarse scan phase of transit detection.
- * Scans at configurable intervals (default 10s) to find candidate windows
- * where the satellite's angular separation from the target body is below threshold.
+ * Two-phase approach for performance:
+ * 1. Find satellite passes above the horizon (60s intervals)
+ * 2. Check target proximity only during passes (configurable intervals)
+ * Supports multiple observer points for area-based detection.
  */
 export function coarseScan(options: CoarseScanOptions): CandidateWindow[] {
   const {
     observer,
+    observers,
     tleLine1,
     tleLine2,
     satelliteNoradId,
@@ -49,75 +104,87 @@ export function coarseScan(options: CoarseScanOptions): CandidateWindow[] {
     thresholdDeg = DEFAULT_CANDIDATE_THRESHOLD_DEG,
   } = options;
 
+  const allObservers = observers && observers.length > 0 ? observers : [observer];
+
+  // Phase 1: Find all satellite passes above the horizon
+  const passes = findSatellitePasses(tleLine1, tleLine2, observer, start, end);
+
+  // Phase 2: For each pass, scan at fine intervals for target proximity
   const intervalMs = intervalSec * 1000;
   const candidates: CandidateWindow[] = [];
   const getTargetPosition = target === "sun" ? getSunPosition : getMoonPosition;
 
-  let windowStart: Date | null = null;
-  let windowEnd: Date | null = null;
-  let windowMinSep = Infinity;
+  for (const pass of passes) {
+    // Expand pass window by 60s on each side to catch edges
+    const passStart = pass.riseTime - 60_000;
+    const passEnd = pass.setTime + 60_000;
 
-  for (let t = start.getTime(); t <= end.getTime(); t += intervalMs) {
-    const date = new Date(t);
+    let windowStart: Date | null = null;
+    let windowEnd: Date | null = null;
+    let windowMinSep = Infinity;
 
-    // Get target body position
-    const targetPos = getTargetPosition(date, observer);
+    for (let t = passStart; t <= passEnd; t += intervalMs) {
+      const date = new Date(t);
 
-    // Early exit: target below minimum altitude
-    if (targetPos.elevationDeg < MIN_TARGET_ALTITUDE_DEG) {
-      closeWindow();
-      continue;
-    }
-
-    // Propagate satellite
-    const satResult = propagateSatellite(tleLine1, tleLine2, date);
-    if (!satResult) {
-      closeWindow();
-      continue;
-    }
-
-    // Get satellite topocentric position
-    const satTopo = getTopocentricPosition(satResult.eci, date, observer);
-
-    // Early exit: satellite below horizon
-    if (satTopo.elevationDeg < 0) {
-      closeWindow();
-      continue;
-    }
-
-    // Compute angular separation
-    const separation = angularSeparationDeg(satTopo, targetPos);
-
-    if (separation < thresholdDeg) {
-      if (!windowStart) {
-        windowStart = date;
+      const satResult = propagateSatellite(tleLine1, tleLine2, date);
+      if (!satResult) {
+        closePassWindow();
+        continue;
       }
-      windowEnd = date;
-      windowMinSep = Math.min(windowMinSep, separation);
-    } else {
-      closeWindow();
+
+      // Get target body position (from center observer)
+      const targetPos = getTargetPosition(date, allObservers[0]);
+
+      // Early exit: target below minimum altitude
+      if (targetPos.elevationDeg < MIN_TARGET_ALTITUDE_DEG) {
+        closePassWindow();
+        continue;
+      }
+
+      // Check separation from each observer point
+      let minSepThisStep = Infinity;
+
+      for (const obs of allObservers) {
+        const satTopo = getTopocentricPosition(satResult.eci, date, obs);
+        if (satTopo.elevationDeg < 0) continue;
+
+        const separation = angularSeparationDeg(satTopo, targetPos);
+        minSepThisStep = Math.min(minSepThisStep, separation);
+
+        // Early exit: already below threshold, no need to check more observers
+        if (minSepThisStep < thresholdDeg) break;
+      }
+
+      if (minSepThisStep < thresholdDeg) {
+        if (!windowStart) {
+          windowStart = date;
+        }
+        windowEnd = date;
+        windowMinSep = Math.min(windowMinSep, minSepThisStep);
+      } else {
+        closePassWindow();
+      }
+    }
+
+    closePassWindow();
+
+    function closePassWindow(): void {
+      if (windowStart && windowEnd) {
+        candidates.push({
+          start: windowStart,
+          end: windowEnd,
+          minSeparationDeg: windowMinSep,
+          target,
+          satelliteNoradId,
+        });
+      }
+      windowStart = null;
+      windowEnd = null;
+      windowMinSep = Infinity;
     }
   }
-
-  // Close any remaining open window
-  closeWindow();
 
   return candidates;
-
-  function closeWindow(): void {
-    if (windowStart && windowEnd) {
-      candidates.push({
-        start: windowStart,
-        end: windowEnd,
-        minSeparationDeg: windowMinSep,
-        target,
-        satelliteNoradId,
-      });
-    }
-    windowStart = null;
-    windowEnd = null;
-    windowMinSep = Infinity;
-  }
 }
 
 export interface FineScanOptions {
