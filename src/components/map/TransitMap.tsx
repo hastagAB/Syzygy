@@ -123,17 +123,39 @@ export default function TransitMap() {
 
       // Draw observation point marker
       const obsPoint = transit.observationPoint;
+      const durationSec = (transit.time.durationMs / 1000).toFixed(1);
+      const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${obsPoint.lat},${obsPoint.lon}`;
+      const timeStr = (typeof transit.time.utc === "string"
+        ? new Date(transit.time.utc)
+        : transit.time.utc
+      ).toLocaleString("en-US", {
+        month: "short",
+        day: "numeric",
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
+        hour12: false,
+      });
+
       L.circleMarker([obsPoint.lat, obsPoint.lon], {
-        radius: isSelected ? 8 : 5,
-        color,
+        radius: isSelected ? 10 : 6,
+        color: isSelected ? "#fff" : color,
         fillColor: color,
-        fillOpacity: 0.8,
-        weight: 1,
+        fillOpacity: 0.9,
+        weight: isSelected ? 2 : 1,
       })
         .bindPopup(
-          `<b>${transit.satellite.name}</b><br/>` +
-            `${transit.target === "sun" ? "Solar" : "Lunar"} transit<br/>` +
-            `Quality: ${transit.quality.score}/100`,
+          `<div style="min-width:180px">` +
+            `<div style="font-weight:700;font-size:14px;margin-bottom:4px">${transit.satellite.name}</div>` +
+            `<div style="color:#9ca3af;font-size:11px;margin-bottom:6px">${transit.target === "sun" ? "☀️ Solar" : "🌙 Lunar"} transit</div>` +
+            `<div style="font-size:12px;margin-bottom:2px"><b>When:</b> ${timeStr} UTC</div>` +
+            `<div style="font-size:12px;margin-bottom:2px"><b>Duration:</b> ${durationSec}s</div>` +
+            `<div style="font-size:12px;margin-bottom:2px"><b>Quality:</b> ${transit.quality.score}/100</div>` +
+            `<div style="font-size:12px;margin-bottom:8px"><b>Distance:</b> ${obsPoint.distanceFromUserKm.toFixed(0)} km from you</div>` +
+            `<a href="${mapsUrl}" target="_blank" rel="noopener" ` +
+            `style="display:inline-block;background:#2563eb;color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none">` +
+            `Navigate here</a>` +
+          `</div>`,
         )
         .addTo(layer);
     }
