@@ -9,11 +9,7 @@ import { propagateSatellite, getTopocentricPosition } from "@/lib/engine/sgp4";
 import { getSunPosition, getMoonPosition } from "@/lib/engine/ephemeris";
 import { DEFAULT_CANDIDATE_THRESHOLD_DEG } from "@/lib/config";
 import type { LatLon } from "@/types";
-import type {
-  TransitTarget,
-  TransitEvent,
-  SearchSuggestions,
-} from "@/types/transit";
+import type { TransitTarget, TransitEvent, SearchSuggestions } from "@/types/transit";
 
 export interface SatelliteInput {
   readonly noradId: number;
@@ -80,8 +76,7 @@ export function searchTransits(input: SearchInput): SearchOutput {
       });
 
       for (const candidate of candidates) {
-        const midpointMs =
-          (candidate.start.getTime() + candidate.end.getTime()) / 2;
+        const midpointMs = (candidate.start.getTime() + candidate.end.getTime()) / 2;
         const midpointTime = new Date(midpointMs);
 
         const bestSample = findBestSamplePoint(
@@ -117,9 +112,7 @@ export function searchTransits(input: SearchInput): SearchOutput {
           satelliteSizeMeters: sat.sizeMeters,
         });
 
-        const hasVisibleTransit = localGT.gridPoints.some(
-          (p) => p.isTransitVisible,
-        );
+        const hasVisibleTransit = localGT.gridPoints.some((p) => p.isTransitVisible);
         if (!hasVisibleTransit) continue;
 
         const bestDist = haversineDistanceKm(input.observer, localGT.bestPoint);
@@ -152,8 +145,7 @@ export function searchTransits(input: SearchInput): SearchOutput {
           satellite: {
             name: sat.name,
             noradId: sat.noradId,
-            angularDiameterArcsec:
-              fineResult.closestApproach.satelliteAngularDiameterArcsec,
+            angularDiameterArcsec: fineResult.closestApproach.satelliteAngularDiameterArcsec,
           },
           target,
           time: {
@@ -165,25 +157,18 @@ export function searchTransits(input: SearchInput): SearchOutput {
           observationPoint: {
             lat: groundTrack.bestPoint.lat,
             lon: groundTrack.bestPoint.lon,
-            distanceFromUserKm: haversineDistanceKm(
-              input.observer,
-              groundTrack.bestPoint,
-            ),
+            distanceFromUserKm: haversineDistanceKm(input.observer, groundTrack.bestPoint),
           },
           targetBody: {
             altitudeDeg: fineResult.closestApproach.targetPosition.altitudeDeg,
             azimuthDeg: fineResult.closestApproach.targetPosition.azimuthDeg,
-            angularDiameterArcsec:
-              fineResult.closestApproach.targetAngularDiameterArcsec,
+            angularDiameterArcsec: fineResult.closestApproach.targetAngularDiameterArcsec,
           },
           groundTrack: {
             centerline: groundTrack.centerline,
             corridorWidthKm: groundTrack.corridorWidthKm,
           },
-          quality: computeQuality(
-            fineResult.closestApproach.separationArcsec,
-            target,
-          ),
+          quality: computeQuality(fineResult.closestApproach.separationArcsec, target),
           minSeparationArcsec: fineResult.closestApproach.separationArcsec,
         };
 
@@ -256,18 +241,19 @@ function computeQuality(
   const normalized = Math.max(0, 1 - minSepArcsec / targetRadiusArcsec);
   const score = Math.round(normalized * 100);
 
-  let notes = "";
-  if (score >= 80) notes = "Excellent central transit";
-  else if (score >= 50) notes = "Good transit visibility";
-  else notes = "Grazing transit";
+  const notes =
+    score >= 80
+      ? "Excellent central transit"
+      : score >= 50
+        ? "Good transit visibility"
+        : "Grazing transit";
 
   return { score, notes };
 }
 
 function buildSuggestions(input: SearchInput): SearchSuggestions {
   const rangeDays = Math.round(
-    (input.dateRange.end.getTime() - input.dateRange.start.getTime()) /
-      (24 * 60 * 60 * 1000),
+    (input.dateRange.end.getTime() - input.dateRange.start.getTime()) / (24 * 60 * 60 * 1000),
   );
 
   const suggestions: SearchSuggestions = {};

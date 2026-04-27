@@ -81,10 +81,7 @@ export function getTopocentricPosition(
     height: 0,
   };
 
-  const posEcf = satellite.eciToEcf(
-    { x: satEci.x, y: satEci.y, z: satEci.z },
-    gmst,
-  );
+  const posEcf = satellite.eciToEcf({ x: satEci.x, y: satEci.y, z: satEci.z }, gmst);
 
   const lookAngles = satellite.ecfToLookAngles(obsRad, posEcf);
 

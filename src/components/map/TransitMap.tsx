@@ -8,8 +8,7 @@ import { useSearchStore } from "@/lib/store/search-store";
 // Fix Leaflet default marker icon paths (they 404 under Next.js bundling)
 const defaultIcon = L.icon({
   iconUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon.png",
-  iconRetinaUrl:
-    "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
+  iconRetinaUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-icon-2x.png",
   shadowUrl: "https://unpkg.com/leaflet@1.9.4/dist/images/marker-shadow.png",
   iconSize: [25, 41],
   iconAnchor: [12, 41],
@@ -43,8 +42,7 @@ export default function TransitMap() {
     L.tileLayer(
       "https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}",
       {
-        attribution:
-          "Tiles &copy; Esri",
+        attribution: "Tiles &copy; Esri",
         maxZoom: 19,
       },
     ).addTo(map);
@@ -125,9 +123,8 @@ export default function TransitMap() {
       const obsPoint = transit.observationPoint;
       const durationSec = (transit.time.durationMs / 1000).toFixed(1);
       const mapsUrl = `https://www.google.com/maps/dir/?api=1&destination=${obsPoint.lat},${obsPoint.lon}`;
-      const timeStr = (typeof transit.time.utc === "string"
-        ? new Date(transit.time.utc)
-        : transit.time.utc
+      const timeStr = (
+        typeof transit.time.utc === "string" ? new Date(transit.time.utc) : transit.time.utc
       ).toLocaleString("en-US", {
         month: "short",
         day: "numeric",
@@ -155,17 +152,11 @@ export default function TransitMap() {
             `<a href="${mapsUrl}" target="_blank" rel="noopener" ` +
             `style="display:inline-block;background:#2563eb;color:#fff;padding:6px 12px;border-radius:6px;font-size:11px;font-weight:600;text-decoration:none">` +
             `Navigate here</a>` +
-          `</div>`,
+            `</div>`,
         )
         .addTo(layer);
     }
   }, [transits, selectedTransitId]);
 
-  return (
-    <div
-      ref={containerRef}
-      className="h-full w-full"
-      data-testid="transit-map"
-    />
-  );
+  return <div ref={containerRef} className="h-full w-full" data-testid="transit-map" />;
 }

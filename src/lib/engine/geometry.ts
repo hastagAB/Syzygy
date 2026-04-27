@@ -23,8 +23,7 @@ export function angularSeparationDeg(
   const alt2 = degToRad(b.elevationDeg);
   const dAz = degToRad(a.azimuthDeg - b.azimuthDeg);
 
-  const cosD =
-    Math.sin(alt1) * Math.sin(alt2) + Math.cos(alt1) * Math.cos(alt2) * Math.cos(dAz);
+  const cosD = Math.sin(alt1) * Math.sin(alt2) + Math.cos(alt1) * Math.cos(alt2) * Math.cos(dAz);
 
   // Clamp to [-1, 1] to avoid NaN from floating-point errors
   const clamped = Math.max(-1, Math.min(1, cosD));
@@ -41,8 +40,7 @@ export function haversineDistanceKm(a: LatLon, b: LatLon): number {
   const lat1 = degToRad(a.lat);
   const lat2 = degToRad(b.lat);
 
-  const h =
-    Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
+  const h = Math.sin(dLat / 2) ** 2 + Math.cos(lat1) * Math.cos(lat2) * Math.sin(dLon / 2) ** 2;
 
   return 2 * EARTH_RADIUS_KM * Math.asin(Math.sqrt(h));
 }
@@ -51,10 +49,7 @@ export function haversineDistanceKm(a: LatLon, b: LatLon): number {
  * Satellite angular diameter in arcseconds given its physical size
  * and slant range (distance from observer).
  */
-export function satelliteAngularDiameterArcsec(
-  sizeMeters: number,
-  rangeKm: number,
-): number {
+export function satelliteAngularDiameterArcsec(sizeMeters: number, rangeKm: number): number {
   const rangeMeters = rangeKm * 1000;
   const angRad = 2 * Math.atan(sizeMeters / (2 * rangeMeters));
   return radToDeg(angRad) * 3600;
@@ -64,10 +59,7 @@ export function satelliteAngularDiameterArcsec(
  * Generate a sparse set of sample points within a circular area.
  * Returns center plus points at 0.35*radius and 0.7*radius in 8 directions.
  */
-export function generateSamplePoints(
-  center: LatLon,
-  radiusKm: number,
-): LatLon[] {
+export function generateSamplePoints(center: LatLon, radiusKm: number): LatLon[] {
   if (radiusKm <= 0) return [center];
 
   const points: LatLon[] = [center];
@@ -75,8 +67,14 @@ export function generateSamplePoints(
 
   const rings = [0.35, 0.7];
   const directions: [number, number][] = [
-    [1, 0], [1, 1], [0, 1], [-1, 1],
-    [-1, 0], [-1, -1], [0, -1], [1, -1],
+    [1, 0],
+    [1, 1],
+    [0, 1],
+    [-1, 1],
+    [-1, 0],
+    [-1, -1],
+    [0, -1],
+    [1, -1],
   ];
 
   for (const ringFraction of rings) {

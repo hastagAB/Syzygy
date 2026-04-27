@@ -47,7 +47,24 @@ function formatCountdown(date: Date | string): string {
 }
 
 function compassDirection(azDeg: number): string {
-  const dirs = ["N", "NNE", "NE", "ENE", "E", "ESE", "SE", "SSE", "S", "SSW", "SW", "WSW", "W", "WNW", "NW", "NNW"];
+  const dirs = [
+    "N",
+    "NNE",
+    "NE",
+    "ENE",
+    "E",
+    "ESE",
+    "SE",
+    "SSE",
+    "S",
+    "SSW",
+    "SW",
+    "WSW",
+    "W",
+    "WNW",
+    "NW",
+    "NNW",
+  ];
   const idx = Math.round(azDeg / 22.5) % 16;
   return dirs[idx];
 }
@@ -73,37 +90,40 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
   const selectedId = useSearchStore((s) => s.selectedTransitId);
   const isSelected = selectedId === event.id;
 
-  const time = typeof event.time.utc === "string"
-    ? new Date(event.time.utc)
-    : event.time.utc;
+  const time = typeof event.time.utc === "string" ? new Date(event.time.utc) : event.time.utc;
 
   const isSolar = event.target === "sun";
-  const accentColor = isSolar ? "amber" : "slate";
 
   return (
     <div
       onClick={() => selectTransit(isSelected ? null : event.id)}
       className={`cursor-pointer rounded-xl border transition-all duration-200 ${
         isSelected
-          ? `border-${accentColor === "amber" ? "amber" : "slate"}-500/50 bg-gray-800/80 shadow-lg shadow-${accentColor === "amber" ? "amber" : "slate"}-500/5`
+          ? isSolar
+            ? "border-amber-500/50 bg-gray-800/80 shadow-lg shadow-amber-500/5"
+            : "border-slate-500/50 bg-gray-800/80 shadow-lg shadow-slate-500/5"
           : "border-gray-800/50 bg-gray-800/30 hover:border-gray-700 hover:bg-gray-800/50"
       }`}
     >
       {/* Card Header */}
       <div className="flex items-start gap-3 px-4 pt-3">
         {/* Rank Badge */}
-        <div className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
-          isSolar ? "bg-amber-900/60 text-amber-300" : "bg-slate-800 text-slate-300"
-        }`}>
+        <div
+          className={`flex h-8 w-8 shrink-0 items-center justify-center rounded-lg text-xs font-bold ${
+            isSolar ? "bg-amber-900/60 text-amber-300" : "bg-slate-800 text-slate-300"
+          }`}
+        >
           #{rank}
         </div>
 
         <div className="min-w-0 flex-1">
           <div className="flex items-center gap-2">
             <span className="font-semibold text-gray-100">{event.satellite.name}</span>
-            <span className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
-              isSolar ? "bg-amber-900/60 text-amber-300" : "bg-slate-800 text-slate-300"
-            }`}>
+            <span
+              className={`rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider ${
+                isSolar ? "bg-amber-900/60 text-amber-300" : "bg-slate-800 text-slate-300"
+              }`}
+            >
               {isSolar ? "☀️ Solar" : "🌙 Lunar"}
             </span>
           </div>
@@ -116,7 +136,9 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
         </div>
 
         {/* Quality Badge */}
-        <div className={`shrink-0 rounded-lg border px-2 py-1 text-center ${qualityBgColor(event.quality.score)}`}>
+        <div
+          className={`shrink-0 rounded-lg border px-2 py-1 text-center ${qualityBgColor(event.quality.score)}`}
+        >
           <div className={`text-lg font-black leading-none ${qualityColor(event.quality.score)}`}>
             {event.quality.score}
           </div>
@@ -127,7 +149,9 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
       {/* Key Metrics Row */}
       <div className="mt-3 grid grid-cols-3 gap-1 px-4">
         <div className="rounded-lg bg-gray-900/50 px-2 py-1.5 text-center">
-          <div className="text-sm font-bold text-white">{formatDuration(event.time.durationMs)}</div>
+          <div className="text-sm font-bold text-white">
+            {formatDuration(event.time.durationMs)}
+          </div>
           <div className="text-[9px] uppercase tracking-wider text-gray-500">Duration</div>
         </div>
         <div className="rounded-lg bg-gray-900/50 px-2 py-1.5 text-center">
@@ -145,10 +169,17 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
       {/* Look Direction */}
       <div className="mt-2 flex items-center gap-3 px-4 pb-3">
         <div className="flex items-center gap-1.5 text-xs text-gray-400">
-          <svg className="h-3.5 w-3.5 text-gray-500" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="h-3.5 w-3.5 text-gray-500"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <path d="M12 2l3 9h9l-7 5 3 9-8-6-8 6 3-9-7-5h9z" />
           </svg>
-          Look {compassDirection(event.targetBody.azimuthDeg)}, {event.targetBody.altitudeDeg.toFixed(0)} above horizon
+          Look {compassDirection(event.targetBody.azimuthDeg)},{" "}
+          {event.targetBody.altitudeDeg.toFixed(0)} above horizon
         </div>
       </div>
 
@@ -161,15 +192,13 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
               Transit Timeline
             </div>
             <div className="flex items-center gap-2 text-xs">
-              <span className="font-mono text-gray-400">
-                {formatTime(event.time.entryUtc)}
-              </span>
+              <span className="font-mono text-gray-400">{formatTime(event.time.entryUtc)}</span>
               <div className="flex-1">
-                <div className={`h-1.5 rounded-full ${isSolar ? "bg-gradient-to-r from-amber-700 via-amber-400 to-amber-700" : "bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700"}`} />
+                <div
+                  className={`h-1.5 rounded-full ${isSolar ? "bg-gradient-to-r from-amber-700 via-amber-400 to-amber-700" : "bg-gradient-to-r from-slate-700 via-slate-400 to-slate-700"}`}
+                />
               </div>
-              <span className="font-mono text-gray-400">
-                {formatTime(event.time.exitUtc)}
-              </span>
+              <span className="font-mono text-gray-400">{formatTime(event.time.exitUtc)}</span>
             </div>
             <div className="mt-1 text-center text-xs font-medium text-gray-300">
               {formatDuration(event.time.durationMs)} total crossing time
@@ -180,28 +209,39 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
           <div className="grid grid-cols-2 gap-x-4 gap-y-1.5 text-xs">
             <div className="flex justify-between">
               <span className="text-gray-500">Min separation</span>
-              <span className="font-mono text-gray-300">{event.minSeparationArcsec.toFixed(1)}&quot;</span>
+              <span className="font-mono text-gray-300">
+                {event.minSeparationArcsec.toFixed(1)}&quot;
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Sat. angular size</span>
-              <span className="font-mono text-gray-300">{event.satellite.angularDiameterArcsec.toFixed(1)}&quot;</span>
+              <span className="font-mono text-gray-300">
+                {event.satellite.angularDiameterArcsec.toFixed(1)}&quot;
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Target angular size</span>
-              <span className="font-mono text-gray-300">{event.targetBody.angularDiameterArcsec.toFixed(0)}&quot;</span>
+              <span className="font-mono text-gray-300">
+                {event.targetBody.angularDiameterArcsec.toFixed(0)}&quot;
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Corridor width</span>
-              <span className="font-mono text-gray-300">{event.groundTrack.corridorWidthKm.toFixed(1)} km</span>
+              <span className="font-mono text-gray-300">
+                {event.groundTrack.corridorWidthKm.toFixed(1)} km
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Target altitude</span>
-              <span className="font-mono text-gray-300">{event.targetBody.altitudeDeg.toFixed(1)}</span>
+              <span className="font-mono text-gray-300">
+                {event.targetBody.altitudeDeg.toFixed(1)}
+              </span>
             </div>
             <div className="flex justify-between">
               <span className="text-gray-500">Target azimuth</span>
               <span className="font-mono text-gray-300">
-                {event.targetBody.azimuthDeg.toFixed(1)} ({compassDirection(event.targetBody.azimuthDeg)})
+                {event.targetBody.azimuthDeg.toFixed(1)} (
+                {compassDirection(event.targetBody.azimuthDeg)})
               </span>
             </div>
           </div>
@@ -213,16 +253,19 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
           {/* Action Buttons */}
           <div className="mt-3 flex gap-2">
             <a
-              href={googleMapsUrl(
-                event.observationPoint.lat,
-                event.observationPoint.lon,
-              )}
+              href={googleMapsUrl(event.observationPoint.lat, event.observationPoint.lon)}
               target="_blank"
               rel="noopener noreferrer"
               onClick={(e) => e.stopPropagation()}
               className="flex flex-1 items-center justify-center gap-1.5 rounded-lg bg-blue-600 py-2 text-xs font-semibold text-white transition-colors hover:bg-blue-500"
             >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <path d="M17.657 16.657L13.414 20.9a2 2 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
                 <circle cx="12" cy="11" r="3" />
               </svg>
@@ -236,7 +279,13 @@ function TransitCard({ event, rank }: { event: TransitEvent; rank: number }) {
               }}
               className="flex items-center justify-center rounded-lg border border-gray-700 px-3 py-2 text-xs text-gray-400 transition-colors hover:border-gray-600 hover:text-gray-300"
             >
-              <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+              <svg
+                className="h-3.5 w-3.5"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+                strokeWidth={2}
+              >
                 <rect x="9" y="9" width="13" height="13" rx="2" />
                 <path d="M5 15H4a2 2 0 01-2-2V4a2 2 0 012-2h9a2 2 0 012 2v1" />
               </svg>
@@ -267,8 +316,10 @@ export default function ResultsList() {
     switch (sortBy) {
       case "date":
         sorted.sort((a, b) => {
-          const ta = typeof a.time.utc === "string" ? new Date(a.time.utc).getTime() : a.time.utc.getTime();
-          const tb = typeof b.time.utc === "string" ? new Date(b.time.utc).getTime() : b.time.utc.getTime();
+          const ta =
+            typeof a.time.utc === "string" ? new Date(a.time.utc).getTime() : a.time.utc.getTime();
+          const tb =
+            typeof b.time.utc === "string" ? new Date(b.time.utc).getTime() : b.time.utc.getTime();
           return ta - tb;
         });
         break;
@@ -276,7 +327,9 @@ export default function ResultsList() {
         sorted.sort((a, b) => b.quality.score - a.quality.score);
         break;
       case "distance":
-        sorted.sort((a, b) => a.observationPoint.distanceFromUserKm - b.observationPoint.distanceFromUserKm);
+        sorted.sort(
+          (a, b) => a.observationPoint.distanceFromUserKm - b.observationPoint.distanceFromUserKm,
+        );
         break;
       case "duration":
         sorted.sort((a, b) => b.time.durationMs - a.time.durationMs);
@@ -293,7 +346,13 @@ export default function ResultsList() {
     return (
       <div className="flex flex-col items-center gap-3 px-6 py-10 text-center">
         <div className="rounded-full bg-gray-800/50 p-4">
-          <svg className="h-8 w-8 text-gray-600" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={1.5}>
+          <svg
+            className="h-8 w-8 text-gray-600"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={1.5}
+          >
             <path d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </div>
@@ -312,9 +371,7 @@ export default function ResultsList() {
           <span className="text-sm font-semibold text-gray-300">
             {filteredAndSorted.length} transit{filteredAndSorted.length !== 1 ? "s" : ""}
             {filterTarget !== "all" && (
-              <span className="ml-1 text-xs font-normal text-gray-500">
-                ({filterTarget})
-              </span>
+              <span className="ml-1 text-xs font-normal text-gray-500">({filterTarget})</span>
             )}
           </span>
           <span className="text-[10px] text-gray-600">
@@ -345,7 +402,7 @@ export default function ResultsList() {
             <select
               value={sortBy}
               onChange={(e) => setSortBy(e.target.value as SortKey)}
-              className="rounded-lg border border-gray-800 bg-gray-900/50 px-2 py-1 text-[10px] text-gray-400 focus:outline-none"
+              className="rounded-lg border border-gray-700 bg-gray-800 px-2 py-1 text-[11px] text-gray-200 focus:outline-none"
             >
               <option value="quality">Best quality</option>
               <option value="date">Soonest</option>
@@ -364,8 +421,8 @@ export default function ResultsList() {
             <p className="font-medium text-amber-300">No transits found</p>
           </div>
           <p className="mt-2 text-xs leading-relaxed text-amber-400/80">
-            Satellite transits are rare events - the ISS transit path is only ~4km wide.
-            Try these suggestions:
+            Satellite transits are rare events - the ISS transit path is only ~4km wide. Try these
+            suggestions:
           </p>
           <ul className="mt-2 space-y-1 text-xs text-amber-400/70">
             {suggestions.increaseRadius && (

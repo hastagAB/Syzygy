@@ -5,10 +5,7 @@ import {
   getSunAngularDiameterArcsec,
   getMoonAngularDiameterArcsec,
 } from "@/lib/engine/ephemeris";
-import {
-  angularSeparationDeg,
-  satelliteAngularDiameterArcsec,
-} from "@/lib/engine/geometry";
+import { angularSeparationDeg, satelliteAngularDiameterArcsec } from "@/lib/engine/geometry";
 import {
   DEFAULT_COARSE_INTERVAL_SEC,
   DEFAULT_CANDIDATE_THRESHOLD_DEG,

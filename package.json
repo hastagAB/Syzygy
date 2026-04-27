@@ -1,19 +1,21 @@
 {
   "name": "syzygy",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "private": true,
-  "description": "Satellite transit finder - predicts when ISS/Hubble/Tiangong transit the Sun or Moon",
+  "description": "Satellite transit finder - predicts when ISS, Hubble, and Tiangong transit the Sun or Moon from any location on Earth",
+  "author": "Syzygy Contributors",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "lint": "eslint src/",
+    "typecheck": "tsc --noEmit",
     "format": "prettier --write \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "format:check": "prettier --check \"src/**/*.{ts,tsx}\" \"tests/**/*.{ts,tsx}\"",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:coverage": "vitest run --coverage",
-    "vibe-check": "powershell -ExecutionPolicy Bypass -File ./scripts/vibe-check.ps1"
+    "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
   "license": "MIT",
   "packageManager": "pnpm@10.33.2",

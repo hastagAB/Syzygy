@@ -163,9 +163,7 @@ describe("computeGroundTrack", () => {
 
     // Centerline should be sorted west-to-east (ascending longitude)
     for (let i = 1; i < result.centerline.length; i++) {
-      expect(result.centerline[i].lon).toBeGreaterThanOrEqual(
-        result.centerline[i - 1].lon,
-      );
+      expect(result.centerline[i].lon).toBeGreaterThanOrEqual(result.centerline[i - 1].lon);
     }
   });
 });

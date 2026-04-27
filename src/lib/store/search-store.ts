@@ -66,8 +66,7 @@ export const useSearchStore = create<SearchState>((set) => ({
   computeTimeMs: null,
   selectedTransitId: null,
 
-  setLocation: (location, name) =>
-    set({ location, locationName: name ?? "" }),
+  setLocation: (location, name) => set({ location, locationName: name ?? "" }),
   setLocationName: (name) => set({ locationName: name }),
   setDateRange: (start, end) => set({ dateRange: { start, end } }),
   setRadiusKm: (km) => set({ radiusKm: km }),

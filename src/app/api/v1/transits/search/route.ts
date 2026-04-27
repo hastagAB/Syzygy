@@ -4,11 +4,7 @@ import { searchTransits } from "@/lib/engine/search-orchestrator";
 import { fetchTle } from "@/lib/data/tle-fetcher";
 import { getSatelliteByNoradId } from "@/lib/data/satellite-catalog";
 import { TleCache } from "@/lib/data/tle-cache";
-import {
-  MAX_DATE_RANGE_DAYS,
-  MIN_RADIUS_KM,
-  MAX_RADIUS_KM,
-} from "@/lib/config";
+import { MAX_DATE_RANGE_DAYS, MIN_RADIUS_KM, MAX_RADIUS_KM } from "@/lib/config";
 
 const tleCache = new TleCache();
 
@@ -52,8 +48,7 @@ export async function POST(request: NextRequest) {
     // Validate date range
     const start = new Date(dateRange.start);
     const end = new Date(dateRange.end);
-    const rangeDays =
-      (end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000);
+    const rangeDays = (end.getTime() - start.getTime()) / (24 * 60 * 60 * 1000);
 
     if (rangeDays <= 0 || rangeDays > MAX_DATE_RANGE_DAYS) {
       return NextResponse.json(

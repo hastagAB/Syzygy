@@ -11,9 +11,7 @@ describe("geocoder", () => {
   });
 
   it("should_geocode_address_to_coordinates", async () => {
-    const mockResponse = [
-      { lat: "45.4642", lon: "9.1900", display_name: "Milan, Italy" },
-    ];
+    const mockResponse = [{ lat: "45.4642", lon: "9.1900", display_name: "Milan, Italy" }];
     vi.mocked(fetch).mockResolvedValueOnce({
       ok: true,
       json: async () => mockResponse,

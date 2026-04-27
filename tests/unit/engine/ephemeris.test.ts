@@ -10,10 +10,7 @@ describe("sun ephemeris", () => {
   it("should_compute_sun_position_at_known_time", () => {
     // June 21, 2024 ~11:23 UTC is close to local solar noon for Milan (lon 9.19E)
     // Solar noon UTC = 12:00 - (lon/15) hours = 12:00 - 0.61 = ~11:23 UTC
-    const pos = getSunPosition(
-      new Date("2024-06-21T11:23:00Z"),
-      { lat: 45.4642, lon: 9.19 },
-    );
+    const pos = getSunPosition(new Date("2024-06-21T11:23:00Z"), { lat: 45.4642, lon: 9.19 });
 
     // At local solar noon in Milan on June solstice, Sun altitude ~68 degrees
     // (90 - 45.46 + 23.44 = 67.98)
@@ -26,10 +23,7 @@ describe("sun ephemeris", () => {
 
   it("should_return_negative_altitude_when_below_horizon", () => {
     // Midnight UTC in Milan - Sun should be well below horizon
-    const pos = getSunPosition(
-      new Date("2024-06-21T01:00:00Z"),
-      { lat: 45.4642, lon: 9.19 },
-    );
+    const pos = getSunPosition(new Date("2024-06-21T01:00:00Z"), { lat: 45.4642, lon: 9.19 });
     expect(pos.elevationDeg).toBeLessThan(0);
   });
 
@@ -43,10 +37,7 @@ describe("sun ephemeris", () => {
 
 describe("moon ephemeris", () => {
   it("should_compute_moon_position_at_known_time", () => {
-    const pos = getMoonPosition(
-      new Date("2024-02-24T22:00:00Z"),
-      { lat: 45.4642, lon: 9.19 },
-    );
+    const pos = getMoonPosition(new Date("2024-02-24T22:00:00Z"), { lat: 45.4642, lon: 9.19 });
     // Moon should be somewhere in the sky - verify it returns valid numbers
     expect(pos.elevationDeg).toBeGreaterThanOrEqual(-90);
     expect(pos.elevationDeg).toBeLessThanOrEqual(90);

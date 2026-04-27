@@ -34,9 +34,8 @@ export default function Home() {
         {/* Footer disclaimer */}
         <div className="mt-auto border-t border-gray-800/50 px-4 py-3">
           <p className="text-[10px] leading-relaxed text-gray-600">
-            Predictions based on SGP4 orbital propagation. Accuracy depends on TLE
-            freshness. Always verify with transit-finder.com before traveling. Weather
-            conditions not accounted for.
+            Predictions based on SGP4 orbital propagation. Accuracy depends on TLE freshness. Always
+            verify with transit-finder.com before traveling. Weather conditions not accounted for.
           </p>
         </div>
       </aside>
@@ -50,7 +49,10 @@ export default function Home() {
               <div className="relative h-10 w-10">
                 <div className="absolute inset-0 rounded-full border-2 border-indigo-500/30" />
                 <div className="absolute inset-0 animate-spin rounded-full border-2 border-transparent border-t-indigo-500" />
-                <div className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-amber-500" style={{ animationDirection: "reverse", animationDuration: "0.8s" }} />
+                <div
+                  className="absolute inset-2 animate-spin rounded-full border-2 border-transparent border-b-amber-500"
+                  style={{ animationDirection: "reverse", animationDuration: "0.8s" }}
+                />
               </div>
               <p className="text-sm font-medium text-gray-300">Scanning orbital paths...</p>
               <p className="text-xs text-gray-500">This may take 5-30 seconds</p>

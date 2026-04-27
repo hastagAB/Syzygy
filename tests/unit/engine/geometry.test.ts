@@ -60,27 +60,18 @@ describe("geometry", () => {
 
   it("should_compute_haversine_distance_known_cities", () => {
     // London to Paris: ~343 km
-    const dist = haversineDistanceKm(
-      { lat: 51.5074, lon: -0.1278 },
-      { lat: 48.8566, lon: 2.3522 },
-    );
+    const dist = haversineDistanceKm({ lat: 51.5074, lon: -0.1278 }, { lat: 48.8566, lon: 2.3522 });
     expect(dist).toBeCloseTo(343, -1); // within 10 km
   });
 
   it("should_compute_haversine_zero_for_same_point", () => {
-    const dist = haversineDistanceKm(
-      { lat: 45.0, lon: 9.0 },
-      { lat: 45.0, lon: 9.0 },
-    );
+    const dist = haversineDistanceKm({ lat: 45.0, lon: 9.0 }, { lat: 45.0, lon: 9.0 });
     expect(dist).toBe(0);
   });
 
   it("should_handle_antimeridian_crossing", () => {
     // Points on either side of the antimeridian
-    const dist = haversineDistanceKm(
-      { lat: 0, lon: 179 },
-      { lat: 0, lon: -179 },
-    );
+    const dist = haversineDistanceKm({ lat: 0, lon: 179 }, { lat: 0, lon: -179 });
     // Should be ~222 km, not ~39,800 km
     expect(dist).toBeLessThan(300);
   });

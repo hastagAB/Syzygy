@@ -10,10 +10,7 @@ import {
   haversineDistanceKm,
   satelliteAngularDiameterArcsec,
 } from "@/lib/engine/geometry";
-import {
-  GRID_SPACING_KM,
-  DEFAULT_SATELLITE_SIZE_METERS,
-} from "@/lib/config";
+import { GRID_SPACING_KM, DEFAULT_SATELLITE_SIZE_METERS } from "@/lib/config";
 import type { LatLon } from "@/types";
 import type { TransitTarget } from "@/types/transit";
 
@@ -47,11 +44,7 @@ export interface GroundTrackResult {
  * Generate a grid of lat/lon points within a circular radius of a center point.
  * Grid spacing is approximate, in km.
  */
-export function generateGrid(
-  center: LatLon,
-  radiusKm: number,
-  spacingKm: number,
-): LatLon[] {
+export function generateGrid(center: LatLon, radiusKm: number, spacingKm: number): LatLon[] {
   const points: LatLon[] = [];
 
   // Convert spacing to approximate degree offsets
@@ -60,16 +53,8 @@ export function generateGrid(
   const latRadiusDeg = radiusKm / 111.32;
   const lonRadiusDeg = radiusKm / (111.32 * Math.cos((center.lat * Math.PI) / 180));
 
-  for (
-    let dLat = -latRadiusDeg;
-    dLat <= latRadiusDeg;
-    dLat += latSpacingDeg
-  ) {
-    for (
-      let dLon = -lonRadiusDeg;
-      dLon <= lonRadiusDeg;
-      dLon += lonSpacingDeg
-    ) {
+  for (let dLat = -latRadiusDeg; dLat <= latRadiusDeg; dLat += latSpacingDeg) {
+    for (let dLon = -lonRadiusDeg; dLon <= lonRadiusDeg; dLon += lonSpacingDeg) {
       const point = { lat: center.lat + dLat, lon: center.lon + dLon };
       if (haversineDistanceKm(center, point) <= radiusKm) {
         points.push(point);

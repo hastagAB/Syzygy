@@ -124,9 +124,7 @@ describe("coarseScan", () => {
 
     // Windows should not overlap
     for (let i = 1; i < candidates.length; i++) {
-      expect(candidates[i].start.getTime()).toBeGreaterThan(
-        candidates[i - 1].end.getTime(),
-      );
+      expect(candidates[i].start.getTime()).toBeGreaterThan(candidates[i - 1].end.getTime());
     }
   });
 

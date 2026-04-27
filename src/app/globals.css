@@ -29,11 +29,46 @@ input[type="date"]::-webkit-calendar-picker-indicator {
   filter: invert(0.7);
 }
 
-/* Range slider track */
-input[type="range"]::-webkit-slider-runnable-track {
+/* Range slider - reset appearance for consistent styling */
+input[type="range"] {
+  -webkit-appearance: none;
+  appearance: none;
+  height: 4px;
+  background: linear-gradient(to right, #4f46e5, #818cf8);
+  border-radius: 2px;
+  outline: none;
+}
+
+input[type="range"]::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  appearance: none;
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #818cf8;
+  border: 2px solid #312e81;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-thumb {
+  width: 16px;
+  height: 16px;
+  border-radius: 50%;
+  background: #818cf8;
+  border: 2px solid #312e81;
+  cursor: pointer;
+}
+
+input[type="range"]::-moz-range-track {
   background: linear-gradient(to right, #4f46e5, #818cf8);
   height: 4px;
   border-radius: 2px;
+}
+
+/* Select dropdown options dark theme */
+select option {
+  background: #1f2937;
+  color: #e5e7eb;
 }
 
 /* Leaflet popup override for dark theme */

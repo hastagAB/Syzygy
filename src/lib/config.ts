@@ -7,13 +7,9 @@ export const NOMINATIM_BASE_URL =
 export const NOMINATIM_USER_AGENT =
   process.env.NOMINATIM_USER_AGENT ?? "Syzygy/1.0 (satellite-transit-finder)";
 
-export const DEFAULT_COARSE_INTERVAL_SEC = Number(
-  process.env.DEFAULT_COARSE_INTERVAL_SEC ?? 10,
-);
+export const DEFAULT_COARSE_INTERVAL_SEC = Number(process.env.DEFAULT_COARSE_INTERVAL_SEC ?? 10);
 
-export const DEFAULT_FINE_INTERVAL_SEC = Number(
-  process.env.DEFAULT_FINE_INTERVAL_SEC ?? 0.1,
-);
+export const DEFAULT_FINE_INTERVAL_SEC = Number(process.env.DEFAULT_FINE_INTERVAL_SEC ?? 0.1);
 
 export const DEFAULT_CANDIDATE_THRESHOLD_DEG = Number(
   process.env.DEFAULT_CANDIDATE_THRESHOLD_DEG ?? 5,

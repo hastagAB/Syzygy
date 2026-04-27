@@ -131,13 +131,11 @@ function equatorialToHorizontal(
   hourAngle: number,
 ): { az: number; alt: number } {
   const sinAlt =
-    Math.sin(dec) * Math.sin(obsLat) +
-    Math.cos(dec) * Math.cos(obsLat) * Math.cos(hourAngle);
+    Math.sin(dec) * Math.sin(obsLat) + Math.cos(dec) * Math.cos(obsLat) * Math.cos(hourAngle);
   const alt = Math.asin(Math.max(-1, Math.min(1, sinAlt)));
 
   const cosAz =
-    (Math.sin(dec) - Math.sin(alt) * Math.sin(obsLat)) /
-    (Math.cos(alt) * Math.cos(obsLat));
+    (Math.sin(dec) - Math.sin(alt) * Math.sin(obsLat)) / (Math.cos(alt) * Math.cos(obsLat));
   const clampedCosAz = Math.max(-1, Math.min(1, cosAz));
   let az = Math.acos(clampedCosAz);
 

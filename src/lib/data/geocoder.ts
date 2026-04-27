@@ -1,7 +1,4 @@
-import {
-  NOMINATIM_BASE_URL,
-  NOMINATIM_USER_AGENT,
-} from "@/lib/config";
+import { NOMINATIM_BASE_URL, NOMINATIM_USER_AGENT } from "@/lib/config";
 import type { Result } from "@/lib/data/tle-fetcher";
 import type { LatLon } from "@/types";
 

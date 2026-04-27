@@ -13,10 +13,19 @@ out/
 # production
 build/
 
+# typescript
+tsconfig.tsbuildinfo
+
 # misc
 .DS_Store
 *.pem
 *.log
+
+# IDE
+.idea/
+.vscode/
+*.swp
+*.swo
 
 # local env files
 .env

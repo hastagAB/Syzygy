@@ -37,9 +37,7 @@ export default function SearchPanel() {
   async function handleGeocode() {
     if (!searchQuery.trim()) return;
     try {
-      const res = await fetch(
-        `/api/v1/geocode?q=${encodeURIComponent(searchQuery)}`,
-      );
+      const res = await fetch(`/api/v1/geocode?q=${encodeURIComponent(searchQuery)}`);
       const data = await res.json();
       if (data.error) {
         setError(data.error.message);
@@ -63,9 +61,7 @@ export default function SearchPanel() {
         const loc = { lat: pos.coords.latitude, lon: pos.coords.longitude };
         setLocation(loc);
         try {
-          const res = await fetch(
-            `/api/v1/geocode?lat=${loc.lat}&lon=${loc.lon}`,
-          );
+          const res = await fetch(`/api/v1/geocode?lat=${loc.lat}&lon=${loc.lon}`);
           const data = await res.json();
           if (!data.error) {
             setLocationName(data.displayName);
@@ -123,8 +119,7 @@ export default function SearchPanel() {
   }
 
   const rangeDays = Math.round(
-    (new Date(dateRange.end).getTime() - new Date(dateRange.start).getTime()) /
-      (86400000),
+    (new Date(dateRange.end).getTime() - new Date(dateRange.start).getTime()) / 86400000,
   );
 
   return (
@@ -158,15 +153,19 @@ export default function SearchPanel() {
             disabled={isLocating}
             className="flex items-center gap-1.5 text-xs text-indigo-400 transition-colors hover:text-indigo-300 disabled:opacity-50"
           >
-            <svg className="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+            <svg
+              className="h-3.5 w-3.5"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke="currentColor"
+              strokeWidth={2}
+            >
               <circle cx="12" cy="12" r="3" />
               <path d="M12 2v4m0 12v4M2 12h4m12 0h4" />
             </svg>
             {isLocating ? "Locating..." : "Use my location"}
           </button>
-          {locationName && (
-            <span className="truncate text-xs text-gray-500">{locationName}</span>
-          )}
+          {locationName && <span className="truncate text-xs text-gray-500">{locationName}</span>}
         </div>
       </section>
 
@@ -244,9 +243,7 @@ export default function SearchPanel() {
                     if (e.target.checked) {
                       setSelectedSatellites([...selectedSatellites, sat.noradId]);
                     } else {
-                      setSelectedSatellites(
-                        selectedSatellites.filter((id) => id !== sat.noradId),
-                      );
+                      setSelectedSatellites(selectedSatellites.filter((id) => id !== sat.noradId));
                     }
                   }}
                   className="sr-only"
@@ -269,8 +266,8 @@ export default function SearchPanel() {
                 className={`flex cursor-pointer items-center justify-center gap-1.5 rounded-lg border px-2.5 py-1.5 text-xs transition-all ${
                   selectedTargets.includes(target)
                     ? target === "sun"
-                      ? "border-amber-500/50 bg-amber-950/50"
-                      : "border-slate-400/50 bg-slate-900/50"
+                      ? "border-amber-500/50 bg-amber-950/50 text-amber-200"
+                      : "border-indigo-500/50 bg-indigo-950/50 text-indigo-200"
                     : "border-gray-800 bg-gray-800/30 hover:border-gray-700"
                 }`}
               >
@@ -281,9 +278,7 @@ export default function SearchPanel() {
                     if (e.target.checked) {
                       setSelectedTargets([...selectedTargets, target]);
                     } else {
-                      setSelectedTargets(
-                        selectedTargets.filter((t) => t !== target),
-                      );
+                      setSelectedTargets(selectedTargets.filter((t) => t !== target));
                     }
                   }}
                   className="sr-only"
@@ -302,14 +297,18 @@ export default function SearchPanel() {
         disabled={isSearching || !location}
         className="group relative overflow-hidden rounded-lg bg-gradient-to-r from-indigo-600 to-indigo-500 py-3 text-sm font-bold uppercase tracking-wider transition-all hover:from-indigo-500 hover:to-indigo-400 active:scale-[0.98] disabled:cursor-not-allowed disabled:opacity-40"
       >
-        <span className="relative z-10">
-          {isSearching ? "Scanning..." : "Find Transits"}
-        </span>
+        <span className="relative z-10">{isSearching ? "Scanning..." : "Find Transits"}</span>
       </button>
 
       {error && (
         <div className="flex items-start gap-2 rounded-lg border border-red-900/50 bg-red-950/30 px-3 py-2.5">
-          <svg className="mt-0.5 h-4 w-4 shrink-0 text-red-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth={2}>
+          <svg
+            className="mt-0.5 h-4 w-4 shrink-0 text-red-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth={2}
+          >
             <circle cx="12" cy="12" r="10" />
             <path d="M12 8v4m0 4h.01" />
           </svg>

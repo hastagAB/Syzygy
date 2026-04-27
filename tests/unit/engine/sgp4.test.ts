@@ -52,11 +52,7 @@ describe("SGP4 propagation", () => {
 describe("topocentric position", () => {
   it("should_compute_topocentric_from_observer", () => {
     const date = new Date("2024-02-14T12:25:00Z");
-    const satResult = propagateSatellite(
-      ISS_TLE_FIXTURE.line1,
-      ISS_TLE_FIXTURE.line2,
-      date,
-    );
+    const satResult = propagateSatellite(ISS_TLE_FIXTURE.line1, ISS_TLE_FIXTURE.line2, date);
     expect(satResult).not.toBeNull();
     if (!satResult) return;
 

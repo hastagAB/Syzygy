@@ -1,9 +1,7 @@
 import { CELESTRAK_BASE_URL, NOMINATIM_USER_AGENT } from "@/lib/config";
 import type { TLERecord } from "@/types";
 
-export type Result<T> =
-  | { ok: true; value: T }
-  | { ok: false; error: string };
+export type Result<T> = { ok: true; value: T } | { ok: false; error: string };
 
 /**
  * Parse TLE epoch (YYDDD.DDDDDDDD) into a JS Date.
@@ -37,7 +35,11 @@ function isValidTleLine(line: string, lineNum: 1 | 2): boolean {
  * Handles single or multiple satellites in one text block.
  */
 export function parseTleText(text: string): TLERecord[] {
-  const lines = text.trim().split("\n").map((l) => l.trim()).filter(Boolean);
+  const lines = text
+    .trim()
+    .split("\n")
+    .map((l) => l.trim())
+    .filter(Boolean);
   const records: TLERecord[] = [];
 
   let i = 0;
@@ -57,11 +59,7 @@ export function parseTleText(text: string): TLERecord[] {
         });
       }
       i += 2;
-    } else if (
-      !lines[i].startsWith("1 ") &&
-      !lines[i].startsWith("2 ") &&
-      i + 2 < lines.length
-    ) {
+    } else if (!lines[i].startsWith("1 ") && !lines[i].startsWith("2 ") && i + 2 < lines.length) {
       // Name line + line1 + line2
       const name = lines[i];
       const line1 = lines[i + 1];

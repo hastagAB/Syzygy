@@ -12,10 +12,7 @@ import {
   getMoonAngularDiameterArcsec,
 } from "@/lib/engine/ephemeris";
 import { propagateSatellite, getTopocentricPosition } from "@/lib/engine/sgp4";
-import {
-  angularSeparationDeg,
-  satelliteAngularDiameterArcsec,
-} from "@/lib/engine/geometry";
+import { angularSeparationDeg, satelliteAngularDiameterArcsec } from "@/lib/engine/geometry";
 import { ISS_TLE_FIXTURE } from "../../fixtures/tle-fixtures";
 
 // =========================================================================
