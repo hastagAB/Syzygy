@@ -55,8 +55,5 @@ Satellite transit finder - predicts when ISS/Hubble/Tiangong transit the Sun or 
 If you are unsure whether a function, method, or API exists in a dependency, STOP and say "I'm not sure this API exists - please verify." Do not invent plausible-looking function signatures.
 
 ## Current State
-Read `.vibe/STATE.md` for current phase and last-known-good commit.
-Read the active spec in `specs/` before implementing any slice.
-
-## Architecture
-See `ARCHITECTURE.md` for full system design, algorithm details, and API contracts.
+The project is feature-complete (v1.0). All engine, API, and UI code is in `src/`.
+109 tests across 16 files. Run `pnpm check` for full quality gate.

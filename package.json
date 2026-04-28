@@ -3,7 +3,7 @@
   "version": "1.0.0",
   "private": true,
   "description": "Satellite transit finder - predicts when ISS, Hubble, and Tiangong transit the Sun or Moon from any location on Earth",
-  "author": "Syzygy Contributors",
+  "author": "Ayush Bhardwaj",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
@@ -17,7 +17,7 @@
     "test:coverage": "vitest run --coverage",
     "check": "pnpm typecheck && pnpm lint && pnpm format:check && pnpm test"
   },
-  "license": "MIT",
+  "license": "SEE LICENSE IN LICENSE",
   "packageManager": "pnpm@10.33.2",
   "dependencies": {
     "astronomia": "^4.2.0",

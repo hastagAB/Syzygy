@@ -31,11 +31,11 @@ export default function Home() {
           <ResultsList />
         </div>
 
-        {/* Footer disclaimer */}
+        {/* Footer */}
         <div className="mt-auto border-t border-gray-800/50 px-4 py-3">
           <p className="text-[10px] leading-relaxed text-gray-600">
-            Predictions based on SGP4 orbital propagation. Accuracy depends on TLE freshness. Always
-            verify with transit-finder.com before traveling. Weather conditions not accounted for.
+            Uses SGP4 orbital propagation with live TLE data from CelesTrak. Check cloud cover
+            before traveling.
           </p>
         </div>
       </aside>

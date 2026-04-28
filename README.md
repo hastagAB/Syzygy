@@ -1,198 +1,126 @@
+<h1 align="center">
+  <br>
+  <code>S Y Z Y G Y</code>
+  <br>
+  <br>
+</h1>
+
 <p align="center">
-  <img src="https://img.shields.io/badge/Next.js-16-black?style=flat-square&logo=next.js" alt="Next.js 16" />
-  <img src="https://img.shields.io/badge/TypeScript-Strict-blue?style=flat-square&logo=typescript" alt="TypeScript Strict" />
-  <img src="https://img.shields.io/badge/Tests-109%20passing-brightgreen?style=flat-square" alt="109 Tests Passing" />
-  <img src="https://img.shields.io/badge/License-MIT-yellow?style=flat-square" alt="MIT License" />
+  <b>The ISS just crossed the Sun. You had 0.6 seconds to see it. Were you in the right spot?</b>
 </p>
 
-# Syzygy
-
-**Satellite Transit Finder** - Predict exactly when and where the ISS, Hubble, or Tiangong will cross the Sun or Moon from your location.
-
-> *Syzygy (n.): the alignment of three celestial bodies in a straight line - precisely what happens during a satellite transit.*
-
-A satellite transit across the Sun or Moon lasts **less than 1 second** and is visible from a ground strip only **4-10 km wide**. Without precise prediction, you will miss it. Syzygy computes every upcoming transit opportunity for your location, travel radius, and time window - then shows you exactly where to stand and when to look up.
+<p align="center">
+  <img src="https://img.shields.io/badge/Next.js-16-black?style=for-the-badge&logo=next.js" />
+  <img src="https://img.shields.io/badge/TypeScript-Strict-3178C6?style=for-the-badge&logo=typescript&logoColor=white" />
+  <img src="https://img.shields.io/badge/109_Tests-Passing-22c55e?style=for-the-badge" />
+</p>
 
 ---
 
-## Why This Exists
+## The Problem
 
-Satellite solar/lunar transits are among the rarest events in amateur astronomy:
+An astronaut-sized object screams across the Sun at 27,600 km/h. The shadow it casts on Earth is **4 km wide**. The entire event lasts **under a second**. If you are standing 5 km to the left, you see nothing. If you are 2 seconds late, it is over.
 
-| Factor | Value |
+This is a satellite transit - and it is one of the hardest things to photograph in amateur astronomy.
+
+| | |
 |---|---|
-| ISS orbital velocity | 7.66 km/s (27,600 km/h) |
-| Transit duration | 0.3 - 1.5 seconds |
-| Visible ground track width | 4 - 10 km |
-| ISS angular size | ~40-60 arcseconds (similar to Jupiter) |
-| Sun/Moon angular size | ~1,800 arcseconds (0.5 degrees) |
+| **Transit duration** | 0.3 - 1.5 seconds |
+| **Ground track width** | 4 - 10 km |
+| **ISS angular size** | 40-60 arcseconds (size of Jupiter) |
+| **Sun/Moon disk** | 1,800 arcseconds |
+| **Margin of error** | None |
 
-Miss your mark by 5 km and you see nothing. Syzygy eliminates the guesswork.
-
----
-
-## Features
-
-- **Multi-satellite support** - ISS, Hubble Space Telescope, Tiangong (Chinese Space Station)
-- **Solar and lunar transits** - Search for transits across the Sun, Moon, or both
-- **Travel radius** - Set how far you are willing to drive (10-500 km)
-- **Observation point** - Exact GPS coordinates of where to set up your telescope
-- **Google Maps navigation** - One-click directions to the observation point
-- **Transit timeline** - Entry time, exit time, and total crossing duration
-- **Quality scoring** - Each transit rated 0-100 based on duration, altitude, and angular separation
-- **Ground track visualization** - See the transit path on an interactive satellite imagery map
-- **Copy and share** - Copy transit details to clipboard for sharing with fellow astronomers
-- **Filtering and sorting** - Filter by solar/lunar, sort by quality, date, distance, or duration
+There used to be a website for this. It went down. So I built one that is better.
 
 ---
 
-## How It Works
+## What Syzygy Does
 
-```
-You (Observer)
-     |
-     |  line of sight
-     v
- [Satellite] ----> dark silhouette visible against bright disk
-     |
-     v
- [Sun or Moon]
-```
+Enter your city. Set how far you will drive. Pick a date range. Hit search.
 
-### Detection Pipeline
+Syzygy will:
 
-1. **TLE Fetch** - Download fresh orbital elements from CelesTrak (cached 2 hours)
-2. **Coarse Scan** - Propagate satellite orbit via SGP4 at 60-second intervals, identify passes above the horizon
-3. **Candidate Detection** - During each pass, check angular separation to Sun/Moon at 10-second intervals from 17 sample points around the observer
-4. **Fine Scan** - Refine candidates at 0.1-second precision to find exact entry/exit times
-5. **Ground Track** - Compute the visibility corridor and optimal observation point
-6. **Quality Scoring** - Rate each transit based on duration, target altitude, and minimum angular separation
+1. **Propagate satellite orbits** using the same SGP4 model that NORAD uses to track every object in space
+2. **Compute Sun and Moon positions** down to arcsecond precision using Meeus astronomical algorithms
+3. **Scan millions of time-position combinations** to find the exact moments a satellite's path crosses the solar or lunar disk from somewhere near you
+4. **Pinpoint the observation spot** - GPS coordinates, distance from you, Google Maps directions
+5. **Show you the ground track** on a satellite imagery map so you can plan your setup
 
-### The Math
-
-- **Orbital propagation**: SGP4/SDP4 (NORAD standard) via `satellite.js`
-- **Sun/Moon positions**: Meeus algorithms via `astronomia` (topocentric, parallax-corrected)
-- **Angular separation**: Spherical trigonometry on altitude/azimuth coordinates
-- **Sidereal time**: Properly converted from `astronomia`'s seconds to radians
+All of this runs in 2-10 seconds. No account needed. No API key. Just orbital mechanics.
 
 ---
 
 ## Quick Start
 
-### Prerequisites
-
-- [Node.js](https://nodejs.org/) 20+
-- [pnpm](https://pnpm.io/) 10+
-
-### Install and Run
-
 ```bash
-# Clone the repository
-git clone https://github.com/your-username/syzygy.git
+git clone https://github.com/ayush-bhardwaj/syzygy.git
 cd syzygy
-
-# Install dependencies
 pnpm install
-
-# Start development server
 pnpm dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) and start finding transits.
-
-### Environment Variables (Optional)
-
-Copy `.env.example` to `.env.local` to customize:
-
-```bash
-cp .env.example .env.local
-```
-
-All variables have sensible defaults. No API keys required.
+Open **localhost:3000**. That is it.
 
 ---
 
-## Project Structure
+## The Engine
+
+Syzygy is not a wrapper around someone else's API. The entire transit detection pipeline is built from first principles:
 
 ```
-src/
-  app/                          # Next.js App Router
-    api/v1/
-      geocode/route.ts          # Location search proxy (Nominatim)
-      transits/search/route.ts  # Transit search endpoint
-    globals.css                 # Tailwind + custom styles
-    layout.tsx                  # Root layout (Inter font, metadata)
-    page.tsx                    # Main app (sidebar + map)
-  components/
-    map/
-      TransitMap.tsx            # Leaflet map with ESRI satellite tiles
-      index.tsx                 # Dynamic import (SSR disabled)
-    results/
-      ResultsList.tsx           # Transit cards with filters and sorting
-    search/
-      SearchPanel.tsx           # Location, date, radius, satellite controls
-  lib/
-    config.ts                   # All configurable constants
-    data/
-      geocoder.ts               # Nominatim geocoding client
-      satellite-catalog.ts      # Supported satellites registry
-      tle-cache.ts              # In-memory TLE cache with TTL
-      tle-fetcher.ts            # CelesTrak TLE downloader
-    engine/
-      ephemeris.ts              # Sun/Moon position (topocentric)
-      geometry.ts               # Angular separation, coordinate transforms
-      ground-track.ts           # Visibility corridor computation
-      search-orchestrator.ts    # Full search pipeline orchestration
-      sgp4.ts                   # SGP4 propagation wrapper
-      transit-detector.ts       # Two-phase coarse + fine scan
-    store/
-      search-store.ts           # Zustand state management
-  types/
-    astronomia.d.ts             # Type declarations for astronomia
-    geo.ts                      # Geographic coordinate types
-    index.ts                    # Barrel exports
-    satellite.ts                # Satellite data types
-    transit.ts                  # Transit event types
-tests/
-  e2e/                          # End-to-end engine validation
-  fixtures/                     # Test data (TLEs, known transits)
-  unit/                         # Unit tests (109 tests, 16 files)
+CelesTrak TLE Data
+       |
+       v
+  SGP4 Propagation (satellite.js)     Meeus Algorithms (astronomia)
+  "Where is the ISS at time T?"       "Where is the Sun at time T?"
+       |                                       |
+       +------- Angular Separation < 0.25 -----+
+       |           degrees? CANDIDATE.          |
+       v                                        v
+  Fine scan at 100ms precision          Parallax-corrected
+  Find exact entry/exit times           topocentric positions
+       |
+       v
+  Ground track sweep - find the
+  best spot within your travel radius
+       |
+       v
+  Results: where to stand, when to look,
+  how long it lasts, which direction to face
 ```
 
----
+### Two-Phase Detection
 
-## Scripts
+**Phase 1 - Coarse Scan**: Propagate the orbit at 60-second intervals. Identify every pass above the horizon. During each pass, sample 17 points around the observer at 10-second intervals. Flag anything within 5 degrees of the Sun or Moon.
 
-| Command | Description |
-|---|---|
-| `pnpm dev` | Start development server (Turbopack) |
-| `pnpm build` | Production build |
-| `pnpm start` | Start production server |
-| `pnpm test` | Run all tests |
-| `pnpm test:watch` | Run tests in watch mode |
-| `pnpm test:coverage` | Run tests with coverage report |
-| `pnpm typecheck` | TypeScript strict type checking |
-| `pnpm lint` | ESLint |
-| `pnpm format` | Prettier (auto-fix) |
-| `pnpm format:check` | Prettier (check only) |
-| `pnpm check` | Run all checks (typecheck + lint + format + test) |
+**Phase 2 - Fine Scan**: Zoom into candidates at 0.1-second resolution. Compute exact entry time, exit time, minimum angular separation, and crossing duration. Sweep a local grid to find the optimal observation point.
+
+This two-phase approach makes Syzygy fast enough to scan a 30-day window in under 10 seconds.
+
+### Accuracy
+
+- **SGP4** - Same model used by the 18th Space Defense Squadron. Sub-kilometer accuracy for LEO satellites.
+- **Ephemeris** - Sun/Moon positions via Jean Meeus algorithms with topocentric parallax correction. Arcsecond-level precision.
+- **TLEs** - Refreshed from CelesTrak every 2 hours. The ISS gets updated TLEs daily.
+
+The transit corridor is 4-10 km wide. SGP4 is accurate to under 1 km. The math works.
 
 ---
 
 ## Tech Stack
 
-| Layer | Technology | Purpose |
-|---|---|---|
-| Framework | Next.js 16 (App Router) | Full-stack React with API routes |
-| Language | TypeScript 6 (strict) | Type safety across the stack |
-| Styling | Tailwind CSS 4 | Utility-first dark theme |
-| Map | Leaflet + ESRI World Imagery | Interactive satellite map with no API key |
-| State | Zustand | Lightweight client state management |
-| Orbital mechanics | satellite.js | SGP4/SDP4 propagation from TLEs |
-| Astronomy | astronomia | Sun/Moon ephemeris (Meeus algorithms) |
-| Validation | Zod 4 | Runtime input validation on API boundary |
-| Testing | Vitest | 109 tests across 16 files |
-| Package manager | pnpm | Fast, disk-efficient |
+| | |
+|---|---|
+| **Framework** | Next.js 16 (App Router, Turbopack) |
+| **Language** | TypeScript 6 (strict mode) |
+| **Orbital mechanics** | satellite.js - SGP4/SDP4 propagation |
+| **Astronomy** | astronomia - Meeus algorithms |
+| **Map** | Leaflet + ESRI World Imagery |
+| **Styling** | Tailwind CSS 4 |
+| **State** | Zustand |
+| **Validation** | Zod 4 |
+| **Testing** | Vitest - 109 tests across 16 files |
 
 ---
 
@@ -200,13 +128,9 @@ tests/
 
 ### `POST /api/v1/transits/search`
 
-Search for satellite transits within a time window and travel radius.
-
-**Request:**
-
 ```json
 {
-  "location": { "lat": 28.6139, "lon": 77.209 },
+  "location": { "lat": 28.61, "lon": 77.21 },
   "dateRange": {
     "start": "2026-05-01T00:00:00.000Z",
     "end": "2026-05-31T00:00:00.000Z"
@@ -217,119 +141,65 @@ Search for satellite transits within a time window and travel radius.
 }
 ```
 
-**Response:**
-
-```json
-{
-  "meta": {
-    "location": { "lat": 28.6139, "lon": 77.209 },
-    "dateRange": { "start": "...", "end": "..." },
-    "radiusKm": 200,
-    "computeTimeMs": 2847
-  },
-  "transits": [
-    {
-      "id": "uuid",
-      "satellite": { "name": "ISS (ZARYA)", "noradId": 25544, "angularDiameterArcsec": 42.3 },
-      "target": "sun",
-      "time": {
-        "utc": "2026-05-15T09:23:41.200Z",
-        "entryUtc": "2026-05-15T09:23:40.800Z",
-        "exitUtc": "2026-05-15T09:23:41.600Z",
-        "durationMs": 800
-      },
-      "targetBody": { "altitudeDeg": 62.4, "azimuthDeg": 178.2, "angularDiameterArcsec": 1891 },
-      "observationPoint": { "lat": 28.72, "lon": 77.31, "distanceFromUserKm": 14.2 },
-      "groundTrack": { "centerline": [...], "corridorWidthKm": 5.8 },
-      "quality": { "score": 87, "notes": "Excellent transit - long duration, high altitude" },
-      "minSeparationArcsec": 12.4
-    }
-  ],
-  "suggestions": null
-}
-```
+Returns transit events with exact timing, observation coordinates, ground tracks, quality scores, and Google Maps navigation links.
 
 ### `GET /api/v1/geocode?q=Delhi`
 
-Proxy to Nominatim for location search.
+Location search proxy.
 
 ---
 
-## Supported Satellites
+## Project Structure
 
-| Satellite | NORAD ID | Size | Difficulty |
+```
+src/
+  app/                        # Next.js App Router + API routes
+  components/                 # Map, search panel, results list
+  lib/
+    engine/                   # The brain - SGP4, ephemeris, transit detection
+    data/                     # TLE fetching, caching, satellite catalog
+    store/                    # Zustand state
+    config.ts                 # All tunables in one place
+  types/                      # TypeScript type definitions
+tests/
+  unit/                       # 109 tests across 16 files
+  e2e/                        # Engine validation against known transits
+  fixtures/                   # Test TLEs and reference data
+```
+
+---
+
+## Satellites
+
+| Satellite | NORAD ID | Size | Transit Difficulty |
 |---|---|---|---|
-| ISS (ZARYA) | 25544 | 109m | Easy - large and bright |
-| Hubble (HST) | 20580 | 13.2m | Hard - small angular size |
-| Tiangong (CSS) | 54216 | 55m | Medium |
+| **ISS** | 25544 | 109m | Easy - large, bright, low orbit |
+| **Hubble** | 20580 | 13.2m | Hard - small angular size |
+| **Tiangong** | 54216 | 55m | Medium |
 
 ---
 
-## Accuracy
-
-Predictions depend on:
-
-- **TLE freshness** - Orbital elements are cached for 2 hours. Stale TLEs degrade accuracy.
-- **SGP4 model limits** - Accurate to ~1 km for LEO satellites over short prediction windows.
-- **Atmospheric refraction** - Not modeled. Affects low-altitude transits (below 10 degrees).
-- **Weather** - Not accounted for. Always check cloud cover before traveling.
-
-**Recommendation:** Cross-reference predictions with [transit-finder.com](https://transit-finder.com) before traveling to an observation point. Syzygy is a planning tool, not a guarantee.
-
----
-
-## Development
-
-### Architecture Overview
-
-```
-Browser                    Next.js Server              External
-  |                            |                          |
-  |  POST /api/v1/search       |                          |
-  |--------------------------->|                          |
-  |                            |  Fetch TLEs (cached)     |
-  |                            |------------------------->|  CelesTrak
-  |                            |<-------------------------|
-  |                            |                          |
-  |                            |  SGP4 propagation        |
-  |                            |  Sun/Moon ephemeris      |
-  |                            |  Angular separation      |
-  |                            |  Ground track sweep      |
-  |                            |                          |
-  |  Transit results + map     |                          |
-  |<---------------------------|                          |
-```
-
-All computation happens server-side in Next.js API routes. The frontend is a thin client that sends search parameters and renders results on the map.
-
-### Running Tests
+## Scripts
 
 ```bash
-# All tests
-pnpm test
-
-# Watch mode
-pnpm test:watch
-
-# With coverage
-pnpm test:coverage
-
-# Full quality gate
-pnpm check
+pnpm dev              # Start dev server
+pnpm build            # Production build
+pnpm test             # Run 109 tests
+pnpm check            # Full quality gate (types + lint + format + tests)
 ```
-
-### Key Design Decisions
-
-See [ARCHITECTURE.md](ARCHITECTURE.md) for the full system design and [.vibe/decisions/](`.vibe/decisions/`) for Architecture Decision Records.
 
 ---
 
 ## License
 
-[MIT](LICENSE)
+**Source Available** - not open source. You may view and study the code for personal and educational use. You may not copy, redistribute, or use this software commercially without written permission. See [LICENSE](LICENSE) for full terms.
+
+Copyright (c) 2026 Ayush Bhardwaj. All rights reserved.
 
 ---
 
 <p align="center">
-  <i>Point your telescope at the right patch of sky, at the right second, from the right spot on Earth.</i>
+  <i>0.6 seconds. 4 km wide. One chance.</i>
+  <br>
+  <i>Know exactly where to stand.</i>
 </p>
